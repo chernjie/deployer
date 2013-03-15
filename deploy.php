@@ -1,10 +1,8 @@
 <?php
 
-if (empty($_POST) || empty($_POST['payload']))
-	exit('Go read <a href="https://confluence.atlassian.com/display/BITBUCKET/POST+Service+Management">this</a>');
-
 define('WEBROOT', '/var/www/');
 define('LOG_COMMITS', TRUE);
+define('DEBUG', TRUE);
 
 /**
 $_POST['payload'] = '
@@ -48,46 +46,71 @@ $_POST['payload'] = '
 ';
 /**/
 
-/**
- * Return full output instead of just last line
- * @param string $command
- * @param array $output
- * @param int $return_var
- */
-function run_exec($command, &$output = array(), &$return_var = 0)
+class CommandLine
 {
-	exec($command, $output, $return_var);
-	return implode("\n", $output);
+	const DEBUG = DEBUG;
+	protected $lastOutput = '';
+	/**
+	 * Return full output instead of just last line
+	 * @param string $command
+	 * @param array $output
+	 * @param int $return_var
+	 */
+	protected function run_exec($command, &$output = array(), &$return_var = 0)
+	{
+		exec($command, $output, $return_var);
+		$this->lastOutput = implode("\n", $output);
+		if (self::DEBUG) error_log($this->lastOutput);
+		return $this->lastOutput;
+	}
 }
 
-$payload = json_decode($_POST['payload']);
-
-$project = $payload->repository->slug;
-if (LOG_COMMITS)
+class BitBucketDeployer extends CommandLine
 {
-	$hashes = array();
-	foreach ($payload->commits as $commit)
-		$hashes[] = $commit->node;
-	file_put_contents(
-		sprintf('%s-%s.hash', $project, implode('-', $hashes))
-		, $_POST['payload']
-	);
+	const WEBROOT = WEBROOT; // '/var/www/';
+	const LOG_COMMITS = LOG_COMMITS; // TRUE;
+
+	public function __construct($BitBucketPayload)
+	{
+		$this->main($BitBucketPayload);
+	}
+
+	/**
+	 * Main execution
+	 * @param string $payload json_encoded BitBucket payload
+	 */
+	public function main($BitBucketPayload)
+	{
+		$payload = json_decode($BitBucketPayload);
+
+		$project = $payload->repository->slug;
+		if (self::LOG_COMMITS)
+		{
+			$hashes = array();
+			foreach ($payload->commits as $commit)
+				$hashes[] = $commit->node;
+			file_put_contents(
+				sprintf('%s-%s.hash', $project, implode('-', $hashes))
+				, $BitBucketPayload
+			);
+		}
+
+		header('Content-Type: text/plain');
+
+		chdir(self::WEBROOT . $project);
+		// $this->run_exec('which git');
+		// $this->run_exec('pwd');
+		// $this->run_exec('whoami');
+		$this->run_exec('git fetch --verbose origin');
+		$this->run_exec('git rev-list --left-right --count master..@{upstream}');
+		list($ahead, $upstream) = explode("\t", $this->lastOutput);
+		if ($upstream > 0)
+		{
+			$this->run_exec('git rebase origin/master || (git stash save cronjob && git rebase origin/master && git stash pop)');
+		}
+	}
 }
-
-header('Content-Type: text/plain');
-
-$command = $output = $return_var = null;
-
-chdir(WEBROOT . $project);
-// error_log(run_exec('which git'));
-// error_log(run_exec('pwd'));
-// error_log(run_exec('whoami'));
-$output = run_exec('git fetch --verbose origin');
-error_log($output);
-$output = run_exec('git rev-list --left-right --count master..@{upstream}');
-list($ahead, $upstream) = explode("\t", $output);
-if ($upstream > 0)
-{
-	$output = run_exec('git rebase origin/master || (git stash save cronjob && git rebase origin/master && git stash pop)');
-	error_log($output);
-}
+if (empty($_POST) || empty($_POST['payload']))
+	exit('Go read <a href="https://confluence.atlassian.com/display/BITBUCKET/POST+Service+Management">this</a>');
+else
+	new BitBucketDeployer($_POST['payload']);
