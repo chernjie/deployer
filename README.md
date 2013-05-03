@@ -18,3 +18,10 @@ Setup
 
 2. Add this to your cron
 `*/1 * * * * /var/www/deployer/cron.sh`
+
+Alternatives
+============
+
+https://github.com/thephpdeveloper/Deployer
+https://github.com/mislav/git-deploy
+https://github.com/BrunoDeBarros/git-deploy-php
