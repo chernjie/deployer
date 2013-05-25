@@ -4,13 +4,13 @@ deployer
 Custom Git Deployer
 
 How it works
-============
+------------
 1. Utilizing BitBucket POST services, when someone push a commit to BitBucket, BitBucket will make a POST request to `www.yourdomain.com/deploy.php`
 2. `deploy.php` will create a new `commit.hash`
 3. `cron.sh` will pick up `commit.hash` and rebase your git repository
 
 Setup
-=====
+-----
 
 1. Add or symlink `deploy.php` to the `DocumentRoot` of your web directory, e.g.
 `/var/www/project/deploy.php`
@@ -20,8 +20,8 @@ Setup
 `*/1 * * * * /var/www/deployer/cron.sh`
 
 Alternatives
-============
+------------
 
-https://github.com/thephpdeveloper/Deployer
-https://github.com/mislav/git-deploy
-https://github.com/BrunoDeBarros/git-deploy-php
+* https://github.com/thephpdeveloper/Deployer
+* https://github.com/mislav/git-deploy
+* https://github.com/BrunoDeBarros/git-deploy-php
