@@ -8,7 +8,7 @@ do
 		(
 			git rebase origin/master ||
 				(
-					git stash save cronjob &&
+					git stash -u save cronjob &&
 						git rebase origin/master &&
 						git stash pop
 				) ||
