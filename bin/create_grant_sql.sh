@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
+DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd -P)"
 REPO_BASE="$DIR/.."
 WP_CONFIG=$REPO_BASE/htdocs/wp-config.php
 DATA_DIR=$REPO_BASE/data
