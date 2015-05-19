@@ -5,12 +5,12 @@ do
 	date --rfc-3339=seconds | xargs echo $i
 	cd $i &&
 		[ $(git ls-files -o *.hash | wc -l) -gt 0 ] &&
-		git fetch origin &&
+		git fetch &&
 		(
-			git rebase origin/master ||
+			git rebase ||
 				(
 					git stash save -u cronjob &&
-						git rebase origin/master &&
+						git rebase &&
 						git stash pop
 				) ||
 				echo -n
