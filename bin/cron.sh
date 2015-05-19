@@ -35,6 +35,7 @@ updateRepository () {
 				) ||
 				echo -n
 		) &&
+			rm -rf var/cache/* &&
 			chmod -R g+w . &&
 			chown -R www-data:www-data . &&
 			notifySlack deployed $(git describe --tags) on $(hostname):$i
