@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+mkdir -p /var/log/deployer
+
+exec >> /var/log/deployer/deployer.log
+exec 2>> /var/log/deployer/deployer.log
+
 for i in $(ls -d /var/www/*/.git | sed s[.git[[)
 do
 	date --rfc-3339=seconds | xargs echo $i
@@ -17,5 +22,5 @@ do
 		) &&
 			chmod -R g+w . &&
 			chown -R www-data:www-data . &&
-			git ls-files -o *.hash | xargs -n1 -I@ mv @ /var/log/bitbucket
-done 2>&1 | tee -a /var/log/bitbucket/cronjob.log
+			git ls-files -o *.hash | xargs -n1 -I@ mv @ /var/log/deployer
+done
