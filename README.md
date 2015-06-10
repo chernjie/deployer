@@ -13,12 +13,24 @@ Simple Git Deployer
 
 1. Login to Github/Bitbucket, and add `http://yourproject/deploy.php` to your web hook.
 
-2. Add or symlink `deploy.php` to the `DocumentRoot` of your web directory, e.g.
-`/var/www/project/deploy.php`
- * Make sure that `/var/www/project` is a git repository
+2. Clone this repository
+```shell
+git clone https://github.com/chernjie/deployer /var/www/
+```
 
-3. Add this to your cron
+3. Add or symlink `deploy.php` to the `DocumentRoot` of your web directory, e.g. `/var/www/project/deploy.php`
+ * Make sure that `/var/www/project` is a git repository
+```shell
+ln -sf /var/www/deployer/deploy.php /var/www/project
+```
+
+4. Add this to your cron
 `* * * * * /var/www/deployer/cron.sh`
+
+Make sure your cronjob run as root
+```shell
+sudo crontab -e
+```
 
 #### Alternatives
 

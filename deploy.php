@@ -1,54 +1,10 @@
 <?php
 
-define('WEBROOT', '/var/www/');
-define('LOG_COMMITS', TRUE);
-define('DEBUG', TRUE);
-
-/**
-$_POST['payload'] = '
-{
-	"canon_url": "https://bitbucket.org",
-	"commits": [
-		{
-			"author": "marcus",
-			"branch": "master",
-			"files": [
-				{
-					"file": "somefile.py",
-					"type": "modified"
-				}
-			],
-			"message": "Added some more things to somefile.py\n",
-			"node": "620ade18607a",
-			"parents": [
-				"702c70160afc"
-			],
-			"raw_author": "Marcus Bertrand <marcus@somedomain.com>",
-			"raw_node": "620ade18607ac42d872b568bb92acaa9a28620e9",
-			"revision": null,
-			"size": -1,
-			"timestamp": "2012-05-30 05:58:56",
-			"utctimestamp": "2012-05-30 03:58:56+00:00"
-		}
-	],
-	"repository": {
-		"absolute_url": "/marcus/project-x/",
-		"fork": false,
-		"is_private": true,
-		"name": "Project X",
-		"owner": "marcus",
-		"scm": "git",
-		"slug": "metaf",
-		"website": "https://atlassian.com/"
-	},
-	"user": "marcus"
-}
-';
-/**/
+// For debugging purpose, you can turn on SAVE_PAYLOAD
+define('SAVE_PAYLOAD', FALSE);
 
 class CommandLine
 {
-	const DEBUG = DEBUG;
 	protected $lastOutput = '';
 
 	/**
@@ -61,19 +17,15 @@ class CommandLine
 	{
 		exec($command, $output, $return_var);
 		$this->lastOutput = implode("\n", $output);
-		if (self::DEBUG) error_log($this->lastOutput);
+		error_log($this->lastOutput);
 		return $this->lastOutput;
 	}
 }
 
 abstract class Deployer extends CommandLine
 {
-	const WEBROOT     = WEBROOT; // '/var/www/';
-	const LOG_COMMITS = LOG_COMMITS; // TRUE;
-
 	public function __construct($payload)
 	{
-		self::DEBUG && error_log($payload);
 		$this->payload = $payload;
 		$this->main();
 	}
@@ -93,27 +45,21 @@ abstract class Deployer extends CommandLine
 	 */
 	public function main()
 	{
-		if (self::LOG_COMMITS)
+		if (SAVE_PAYLOAD)
 		{
 			file_put_contents(
 				sprintf('hook-%s-%s.hash', $this->getProject(), implode('-', $this->getHashes()))
-				, json_encode($this->payload)
+				, $this->payload
 			);
+		}
+		else
+		{
+			touch('deployer.hash');
+			error_log(__CLASS__ . ':' . $this->payload);
 		}
 
 		header('Content-Type: text/plain');
-
-		chdir(self::WEBROOT . $this->getProject());
-		// $this->run_exec('which git');
-		// $this->run_exec('pwd');
-		// $this->run_exec('whoami');
-		$this->run_exec('git fetch --verbose origin');
-		$this->run_exec('git rev-list --left-right --count master..@{upstream}');
-		list($ahead, $upstream) = explode("\t", $this->lastOutput);
-		if ($upstream > 0)
-		{
-			$this->run_exec('git rebase origin/master || (git stash save cronjob && git rebase origin/master && git stash pop)');
-		}
+		echo 'OK';
 	}
 }
 
