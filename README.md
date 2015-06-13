@@ -32,6 +32,16 @@ Make sure your cronjob run as root
 sudo crontab -e
 ```
 
+### Slack Integration
+
+Send notification whenever `deployer` completes a deploy.
+
+Add a new [incoming-webhook](https://my.slack.com/services/new/incoming-webhook) integration on Slack. Copy the `Webhook URL` to your repository:
+
+```shell
+git config deployer.slack.incoming-webhook <webhook url>
+```
+
 #### Alternatives
 
 * Bruteforce Cron `* * * * * cd /var/www/project && git pull --rebase`
