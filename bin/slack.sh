@@ -13,8 +13,9 @@ main () {
   getSlackConfig || _error git config deployer.slack.incoming-webhook not found
   local username=$1
   shift
-  curl -XPOST \
-    --data-urlencode 'payload={"username":"'"$username"'", "text":"'"$@"'"}' \
+  local text="$@"
+  curl -XPOST --silent \
+    --data-urlencode 'payload={"username":"'"$username"'", "text":"'"$text"'"}' \
     $(getSlackConfig)
 }
 
