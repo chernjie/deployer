@@ -10,9 +10,8 @@ notifySlack () {
 	return 0
 }
 
-
-for i in $(ls -d /var/www/*/.git | sed s[.git[[)
-do
+updateRepository () {
+	local i=$1
 	date --rfc-3339=seconds | xargs echo $i
 	cd $i &&
 		[ $(git ls-files -o *.hash | wc -l) -gt 0 ] &&
@@ -30,4 +29,15 @@ do
 			chown -R www-data:www-data . &&
 			notifySlack deployed $(git describe --tags) on $(hostname):$i &&
 			git ls-files -o *.hash | xargs -n1 -I@ mv @ /var/log/deployer
-done
+
+}
+
+case $1 in
+	*)	updateRepository $1 ;;
+	'')
+		for i in $(ls -d /var/www/*/.git | sed s[.git[[)
+		do
+			updateRepository $i
+		done
+		;;
+esac
