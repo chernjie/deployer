@@ -32,7 +32,25 @@ updateRepository () {
 
 }
 
+createFifo () {
+	test -p /tmp/deployer.fifo ||
+	mkfifo /tmp/deployer.fifo
+	chmod o+w /tmp/deployer.fifo
+}
+
+watchFifo () {
+	createFifo
+	while true
+	do
+		while read repository
+		do
+			/var/www/deployer/bin/cron.sh $repository
+		done < /tmp/deployer.fifo
+	done
+}
+
 case $1 in
+	watchFifo) watchFifo;;
 	*)	updateRepository $1 ;;
 	'')
 		for i in $(ls -d /var/www/*/.git | sed s[.git[[)

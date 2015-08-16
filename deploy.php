@@ -45,18 +45,15 @@ abstract class Deployer extends CommandLine
 	 */
 	public function main()
 	{
-		if (SAVE_PAYLOAD)
-		{
-			file_put_contents(
-				sprintf('hook-%s-%s.hash', $this->getProject(), implode('-', $this->getHashes()))
-				, $this->payload
-			);
-		}
-		else
-		{
-			touch('deployer.hash');
-			error_log(__CLASS__ . ':' . $this->payload);
-		}
+		$content = array(
+			getcwd(),
+			date('c')
+		);
+		SAVE_PAYLOAD && array_push($content, $this->payload);
+		array_push($content, PHP_EOL);
+
+		file_put_contents('/tmp/deployer.fifo', implode(' ', $content), FILE_APPEND | LOCK_EX);
+		error_log(__CLASS__ . ':' . $this->payload);
 
 		header('Content-Type: text/plain');
 		echo 'OK';
