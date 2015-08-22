@@ -55,8 +55,13 @@ watchFifo () {
 	done
 }
 
+stopAllFifo () {
+	ps aux | grep -ve grep | grep watchFifo | awk '{print $2}' | xargs kill
+}
+
 case $1 in
 	watchFifo) watchFifo;;
+	stop)      stopAllFifo;;
 	'') # legacy 0.3.0
 		for i in $(ls -d /var/www/*/.git | sed s[.git[[)
 		do
