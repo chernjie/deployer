@@ -4,6 +4,13 @@ mkdir -p /var/log/deployer
 
 exec 2>&1 >> /var/log/deployer/deployer.log
 
+require () {
+	for i
+	do
+		command -v $i > /dev/null || _error command $i not found
+	done
+}
+
 _error() {
   echo $@ >&2
   exit 1
@@ -58,6 +65,8 @@ watchFifo () {
 stopAllFifo () {
 	ps aux | grep -ve grep | grep watchFifo | awk '{print $2}' | xargs kill
 }
+
+require mkdir mkfifo date git chown chmod ps grep awk nohup read
 
 case $1 in
 	watchFifo) watchFifo;;
