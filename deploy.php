@@ -1,8 +1,5 @@
 <?php
 
-// For debugging purpose, you can turn on SAVE_PAYLOAD
-define('SAVE_PAYLOAD', FALSE);
-
 class CommandLine
 {
 	protected $lastOutput = '';
@@ -49,7 +46,6 @@ abstract class Deployer extends CommandLine
 			getcwd(),
 			date('c')
 		);
-		SAVE_PAYLOAD && array_push($content, $this->payload);
 		array_push($content, PHP_EOL);
 
 		file_put_contents('/tmp/deployer.fifo', implode(' ', $content), FILE_APPEND | LOCK_EX);
