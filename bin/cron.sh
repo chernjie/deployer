@@ -15,7 +15,7 @@ notifySlack () {
 }
 
 updateRepository () {
-	local i=$1
+	local i=$(cd $1 && git rev-parse --show-toplevel)
 	date --rfc-3339=seconds | xargs echo $i
 	cd $i &&
 		git fetch &&
