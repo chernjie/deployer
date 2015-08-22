@@ -44,7 +44,7 @@ watchFifo () {
 	createFifo
 
 	# control the number of running listeners
-	test $(ps aux | grep watchFifo -c) -gt 4 && _error another fifo listener is running
+	test $(ps aux | grep watchFifo -c) -gt 6 && _error another fifo listener is running
 
 	while true
 	do
