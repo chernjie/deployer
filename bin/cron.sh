@@ -62,14 +62,5 @@ stopAllFifo () {
 case $1 in
 	watchFifo) watchFifo;;
 	stop)      stopAllFifo;;
-	'') # legacy 0.3.0
-		for i in $(ls -d /var/www/*/.git | sed s[.git[[)
-		do
-			cd $i &&
-				[ $(git ls-files -o *.hash | wc -l) -gt 0 ] &&
-				updateRepository $i &&
-				git ls-files -o *.hash | xargs -n1 -I@ mv @ /var/log/deployer
-			cd -
-		done
-		;;
+	start)     nohup $0 watchFifo &;;
 esac
