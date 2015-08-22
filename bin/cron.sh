@@ -2,8 +2,12 @@
 
 mkdir -p /var/log/deployer
 
-exec >> /var/log/deployer/deployer.log
-exec 2>> /var/log/deployer/deployer.log
+exec 2>&1 >> /var/log/deployer/deployer.log
+
+_error() {
+  echo $@ >&2
+  exit 1
+}
 
 notifySlack () {
 	/var/www/deployer/bin/slack.sh deployer $@
@@ -38,6 +42,10 @@ createFifo () {
 
 watchFifo () {
 	createFifo
+
+	# control the number of running listeners
+	test $(ps aux | grep watchFifo -c) -gt 4 && _error another fifo listener is running
+
 	while true
 	do
 		while read repository
