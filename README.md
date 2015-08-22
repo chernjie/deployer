@@ -6,8 +6,8 @@ Simple Git Deployer
 #### How it works
 
 1. Utilizing [Github webhooks](https://developer.github.com/webhooks/) or [BitBucket POST services](https://confluence.atlassian.com/display/BITBUCKET/POST+hook+management)
-2. `deploy.php` will create a new `commit.hash`
-3. `cron.sh` will pick up `commit.hash` and rebase your git repository
+2. `deploy.php` will write to a fifo file `/tmp/deployer.fifo`
+3. a listener will pick up instructions from `/tmp/deployer.fifo` and rebase your git repository
 
 #### Setup
 
@@ -25,7 +25,7 @@ ln -sf /var/www/deployer/deploy.php /var/www/project
 ```
 
 4. Add this to your cron
-`* * * * * /var/www/deployer/cron.sh`
+`* * * * * /var/www/deployer/cron.sh watchFifo`
 
 Make sure your cronjob run as root
 ```shell
