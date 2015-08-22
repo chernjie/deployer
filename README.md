@@ -5,9 +5,7 @@ Simple Git Deployer
 
 #### How it works
 
-1. Utilizing [Github webhooks](https://developer.github.com/webhooks/) or [BitBucket POST services](https://confluence.atlassian.com/display/BITBUCKET/POST+hook+management)
-2. `deploy.php` will create a new `commit.hash`
-3. `cron.sh` will pick up `commit.hash` and rebase your git repository
+Utilizing [Github webhooks](https://developer.github.com/webhooks/) or [BitBucket POST services](https://confluence.atlassian.com/display/BITBUCKET/POST+hook+management), a URL is called to trigger a git update
 
 #### Setup
 
@@ -24,13 +22,27 @@ git clone https://github.com/chernjie/deployer /var/www/
 ln -sf /var/www/deployer/deploy.php /var/www/project
 ```
 
-4. Add this to your cron
-`* * * * * /var/www/deployer/cron.sh`
+4. Start one or two workers
+```
+# start one worker
+sudo /var/www/deployer/bin/cron.sh start
+
+# start another worker
+sudo /var/www/deployer/bin/cron.sh start
+
+# up to a maximum of two workers only
+sudo /var/www/deployer/bin/cron.sh start
+```
+
+Alternatively, you could add this to your cron
+`* * * * * /var/www/deployer/cron.sh watchFifo`
+This will run up to a maximum of two workers
 
 Make sure your cronjob run as root
 ```shell
 sudo crontab -e
 ```
+
 
 ### Slack Integration
 
