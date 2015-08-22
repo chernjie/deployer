@@ -44,14 +44,13 @@ watchFifo () {
 	do
 		while read repository
 		do
-			/var/www/deployer/bin/cron.sh $repository
+			updateRepository $repository
 		done < /tmp/deployer.fifo
 	done
 }
 
 case $1 in
 	watchFifo) watchFifo;;
-	*)	updateRepository $1 ;;
 	'')
 		for i in $(ls -d /var/www/*/.git | sed s[.git[[)
 		do
