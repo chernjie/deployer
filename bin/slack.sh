@@ -15,7 +15,7 @@ main () {
   shift
   local text="$@"
   curl -XPOST --silent \
-    --output /dev/null
+    --output /dev/null \
     --data-urlencode 'payload={"username":"'"$username"'", "text":"'"$text"'"}' \
     $(getSlackConfig)
 }
