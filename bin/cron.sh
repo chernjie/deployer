@@ -22,6 +22,7 @@ notifySlack () {
 }
 
 updateRepository () {
+	echo updateRepository $@
 	local i=$(cd $1 && git rev-parse --show-toplevel)
 	date --rfc-3339=seconds | xargs echo $i
 	cd $i &&
@@ -51,7 +52,7 @@ watchFifo () {
 	createFifo
 
 	# control the number of running listeners
-	test $(ps aux | grep watchFifo -c) -gt 6 && _error another fifo listener is running
+	test $(ps aux | grep -ve grep | grep watchFifo -c) -gt 3 && _error another fifo listener is running
 
 	while true
 	do
