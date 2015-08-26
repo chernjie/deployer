@@ -43,7 +43,7 @@ abstract class Deployer extends CommandLine
 	public function main()
 	{
 		$content = array(
-			getcwd(),
+			$_SERVER['DOCUMENT_ROOT'],
 			date('c')
 		);
 		array_push($content, PHP_EOL);
