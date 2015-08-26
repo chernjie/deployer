@@ -63,8 +63,12 @@ watchFifo () {
 	done
 }
 
+statusFifo () {
+	ps aux | grep -ve grep | grep watchFifo
+}
+
 stopAllFifo () {
-	ps aux | grep -ve grep | grep watchFifo | awk '{print $2}' | xargs kill
+	statusFifo | awk '{print $2}' | xargs kill
 }
 
 require mkdir mkfifo date git chown chmod ps grep awk nohup read
@@ -73,4 +77,5 @@ case $1 in
 	watchFifo) watchFifo;;
 	stop)      stopAllFifo;;
 	start)     nohup $0 watchFifo &;;
+	status)    statusFifo;;
 esac
